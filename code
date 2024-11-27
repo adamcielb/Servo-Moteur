@@ -1,0 +1,54 @@
+/*
+Commande Servo Moteur MG 995
+Programme Basique sur Arduino Mega.
+IDE Arduino 2.3.3
+Constituants :
+- Servo moteur MG 995
+- Potentiomètre 10 KOhm
+Version 1 : octobre 2024
+*/
+
+// --- Inclusion des bibliothèques
+#include <Servo.h>
+
+// --- Déclaration des variables et autres objets
+Servo myServo; // Création de l'objet servo nommé "myServo".
+const int potPin = A0; // Le curseur du potentiomètre est connecté à la broche analogique A0 de l'Arduino.
+float potPercent; // Variable pour le pourcentage de la position du potentiomètre.
+int angle; // Variable pour fixer l'angle de l'axe moteur.
+const int Angle_Mini = 0;   // Borne inférieure de la variation angulaire de l'axe moteur.
+const int Angle_Max = 179; // Borne supérieure de la variation angulaire de l'axe moteur.
+
+// --- Configuration
+void setup() {
+  myServo.attach(3); // Déclare que la broche PWM du servo est connectée à la broche digitale 3.
+  Serial.begin(9600); // Initialisation de la liaison série PC <-> Arduino.
+}
+
+// --- Boucle d'exécution
+void loop() {
+  Serial.println(""); 
+  Serial.println("Nouvelle commande d'angle !!");
+  Serial.println("");
+
+  // -- Lecture de la commande angulaire
+  int potVal = analogRead(potPin); // Lecture de la valeur du potentiomètre.
+  potPercent = (potVal / 1023.0) * 100; // Calcul du pourcentage correspondant.
+
+  // -- Conversion du pourcentage en angle
+  angle = map(potPercent, 0, 100, Angle_Mini, Angle_Max);
+  /* La valeur de "potPercent" (en %) est transposée en un angle
+     compris entre Angle_Mini et Angle_Max (par défaut 0° à 179°). */
+
+  // -- Affichage du pourcentage et de l'angle demandé
+  Serial.print("Position du potentiomètre : ");
+  Serial.print(potPercent); // Affiche le pourcentage avec 1 décimale.
+  Serial.print("%, Angle calculé : ");
+  Serial.println(angle);
+
+  // -- Application de la commande de position au servo moteur
+  myServo.write(angle); // Commande de position au servo via la bibliothèque Servo.
+
+  // -- Attente avant la prochaine lecture
+  delay(5000); // Pause de 5 secondes.
+}
